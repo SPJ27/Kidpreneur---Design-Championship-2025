@@ -9,7 +9,7 @@ const TopIdeas = () => {
     const fetch = async () => {
       const {data} = await supabase.from('kid_ideas').select('*');
       const sorted = data.sort((a, b) => b.rating - a.rating);
-      setIdeas(sorted);
+      setIdeas(sorted.slice(0, 3));
     };
     fetch();
   }, []);

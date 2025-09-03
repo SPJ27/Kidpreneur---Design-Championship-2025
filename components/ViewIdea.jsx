@@ -19,7 +19,15 @@ const ViewIdea = () => {
     let avgScore = likes / views
     let rating
     if (ideaScore > avgScore) {
-      rating = 5
+      if(idea.views>=20) {
+        rating = 5
+      }
+      else if(idea.views>=10) {
+        rating = 4
+      }
+      else{
+        rating = 3.5
+      }
     } else {
       rating = (ideaScore/avgScore*5).toFixed(1)
     }

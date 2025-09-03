@@ -12,6 +12,8 @@ const Submit = () => {
     solution: "",
   });
   const [logo, setLogo] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [successModal, setSuccessModal] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,38 +22,39 @@ const Submit = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
-    const fileExt = logo.name.split(".").pop();
-    console.log(fileExt);
-    const fileID = uuidv4();
-    const fileName = `${fileID}.${fileExt}`;
+    try {
+      let publicUrl = "";
+      if (logo) {
+        const fileExt = logo.name.split(".").pop();
+        const fileID = uuidv4();
+        const fileName = `${fileID}.${fileExt}`;
 
-    const { error: uploadError } = await supabase.storage
-      .from("logos")
-      .upload(fileName, logo);
-    console.log("error:", uploadError);
-    const { data } = supabase.storage.from("logos").getPublicUrl(fileName);
-    const publicUrl = data.publicUrl;
-    if (uploadError) {
-      console.error("Upload Error:", uploadError);
-      return;
-    }
+        const { error: uploadError } = await supabase.storage
+          .from("logos")
+          .upload(fileName, logo);
 
-    const { error } = await supabase.from("kid_ideas").insert([
-      {
-        student_name: form.student_name,
-        startup_idea: form.startup_idea,
-        startup_desc: form.startup_desc,
-        startup_logo: publicUrl,
-        problem_statement: form.problem_statement,
-        solution: form.solution,
-      },
-    ]);
+        if (uploadError) throw uploadError;
 
-    if (error) {
-      console.error("Insert Error:", error);
-    } else {
-      console.log("Inserted successfully!");
+        const { data } = supabase.storage.from("logos").getPublicUrl(fileName);
+        publicUrl = data.publicUrl;
+      }
+
+      const { error } = await supabase.from("kid_ideas").insert([
+        {
+          student_name: form.student_name,
+          startup_idea: form.startup_idea,
+          startup_desc: form.startup_desc,
+          startup_logo: publicUrl,
+          problem_statement: form.problem_statement,
+          solution: form.solution,
+        },
+      ]);
+
+      if (error) throw error;
+
+      // Reset form + show success modal
       setForm({
         student_name: "",
         startup_desc: "",
@@ -61,11 +64,17 @@ const Submit = () => {
         solution: "",
       });
       setLogo(null);
+      setSuccessModal(true);
+    } catch (err) {
+      console.error("Submit error:", err);
+      alert("Something went wrong! Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col min-h-screen  text-[#191919]">
+    <div className="flex flex-col min-h-screen text-[#191919]">
       <main className="flex-grow">
         <div className="max-w-3xl mx-auto px-6 py-20">
           <h1 className="text-4xl font-bold tracking-tight text-center mb-2">
@@ -78,7 +87,7 @@ const Submit = () => {
             Have a question, idea, or feedback? We'd love to hear from you.
           </p>
 
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label className="block text-sm font-semibold mb-1">Name</label>
               <input
@@ -87,33 +96,29 @@ const Submit = () => {
                 required
                 type="text"
                 name="student_name"
+                value={form.student_name}
                 onChange={handleChange}
               />
             </div>
+
             <div>
               <label className="block text-sm font-semibold mb-1">
                 Startup Logo
               </label>
-
               <div className="flex items-center">
                 <label
                   htmlFor="startup_logo"
-                  className="cursor-pointer bg-white text-sm px-5 py-1 rounded-lg border border-gray-900/35  hover:scale-105 hover:shadow-lg transition"
+                  className="cursor-pointer bg-white text-sm px-5 py-1 rounded-lg border border-gray-900/35 hover:scale-105 hover:shadow-lg transition"
                 >
                   Upload Logo
                 </label>
-
                 <input
                   id="startup_logo"
                   type="file"
                   name="startup_logo"
                   className="hidden"
-                  onChange={(e) => {
-                    handleChange(e);
-                    setLogo(e.target.files[0]);
-                  }}
+                  onChange={(e) => setLogo(e.target.files[0])}
                 />
-
                 <span className="ml-3 text-sm text-gray-600" id="file-name">
                   {logo ? logo.name : "No file chosen"}
                 </span>
@@ -130,9 +135,11 @@ const Submit = () => {
                 required
                 type="text"
                 name="startup_idea"
+                value={form.startup_idea}
                 onChange={handleChange}
               />
             </div>
+
             <div>
               <label className="block text-sm font-semibold mb-1">
                 Startup Description
@@ -143,9 +150,11 @@ const Submit = () => {
                 required
                 type="text"
                 name="startup_desc"
+                value={form.startup_desc}
                 onChange={handleChange}
               />
             </div>
+
             <div>
               <label className="block text-sm font-semibold mb-1">
                 Problem Statement
@@ -156,6 +165,7 @@ const Submit = () => {
                 required
                 type="text"
                 name="problem_statement"
+                value={form.problem_statement}
                 onChange={handleChange}
               />
             </div>
@@ -170,6 +180,7 @@ const Submit = () => {
                 placeholder="Describe the solution"
                 required
                 name="solution"
+                value={form.solution}
                 onChange={handleChange}
               ></textarea>
             </div>
@@ -177,15 +188,36 @@ const Submit = () => {
             <div className="text-center">
               <button
                 type="submit"
-                onClick={handleSubmit}
-                className="bg-orange-600 hover:cursor-pointer text-white font-semibold text-sm px-5 py-2  rounded-full shadow-md hover:shadow-lg hover:from-blue-800 hover:to-sky-600 transition-all duration-300"
+                disabled={loading}
+                className={`bg-orange-600 text-white font-semibold text-sm px-5 py-2 rounded-full shadow-md hover:shadow-lg transition-all duration-300 ${
+                  loading ? "opacity-70 cursor-not-allowed" : "hover:scale-105"
+                }`}
               >
-                Send Message
+                {loading ? "Submitting..." : "Send Message"}
               </button>
             </div>
           </form>
         </div>
       </main>
+
+      {successModal && (
+        <div className="fixed inset-0 flex items-center justify-center backdrop-blur-xs shadow-2xl border-2 border-gray-900 z-50">
+          <div className="bg-white p-6 rounded-xl shadow-lg max-w-sm w-full text-center">
+            <h2 className="text-2xl font-bold text-green-600 mb-3">
+              🎉 Idea Submitted!
+            </h2>
+            <p className="text-gray-700 mb-4">
+              Your idea has been successfully submitted.
+            </p>
+            <button
+              onClick={() => setSuccessModal(false)}
+              className="bg-orange-600 text-white px-5 py-2 rounded-lg font-medium hover:scale-105 transition"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
