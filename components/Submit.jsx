@@ -193,7 +193,7 @@ const Submit = () => {
                   loading ? "opacity-70 cursor-not-allowed" : "hover:scale-105"
                 }`}
               >
-                {loading ? "Submitting..." : "Send Message"}
+                {loading ? "Submitting..." : "Submit"}
               </button>
             </div>
           </form>
