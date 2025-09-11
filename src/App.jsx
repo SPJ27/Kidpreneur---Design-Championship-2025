@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Submit from "../components/Submit";
 import IdeaList from "../components/IdeaList";
 import ViewIdea from "../components/ViewIdea";
+import Footer from "../components/Footer";
+import About from "../components/About";
 
 const App = () => {
   return (
@@ -23,11 +25,13 @@ const App = () => {
               </>
             }
           />
+          <Route path="/about" element={<About />} />
           <Route path="/submit" element={<Submit />} />
           <Route path="/ideas" element={<IdeaList />} />
           <Route path="/ideas/:id" element={<ViewIdea />} />
         </Routes>
       </div>
+      <Footer />
     </BrowserRouter>
   );
 };

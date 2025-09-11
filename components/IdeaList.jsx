@@ -33,7 +33,7 @@ const IdeaList = () => {
   });
 
   return (
-    <section className="py-16 bg-gradient-to-b">
+    <section className="py-16 bg-gradient-to-b pt-30">
       <h2 className="text-3xl font-bold text-center mb-12 flex items-center justify-center">
         <PiRankingDuotone className="mr-2" /> Top Ideas
       </h2>

@@ -3,6 +3,7 @@ import { BiLike } from "react-icons/bi";
 import { FaRegStar } from "react-icons/fa";
 import { PiRankingDuotone } from "react-icons/pi";
 import { supabase } from "../utils/supabase";
+import { Link } from "react-router-dom";
 const TopIdeas = () => {
   const [ideas, setIdeas] = useState([]);
   useEffect(() => {
@@ -44,9 +45,9 @@ const TopIdeas = () => {
       </div>
 
       <div className="flex justify-center mt-10">
-        <button className="px-6 py-3 rounded-md bg-orange-600 text-white font-semibold shadow-md hover:scale-105 transition">
+        <Link to={'/ideas'} className="px-6 py-3 rounded-md bg-orange-600 text-white font-semibold shadow-md hover:scale-105 transition">
           View More Ideas
-        </button>
+        </Link>
       </div>
     </section>
   );

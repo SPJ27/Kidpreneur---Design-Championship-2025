@@ -74,17 +74,17 @@ const Submit = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen text-[#191919]">
+    <div className="flex flex-col min-h-screen pt-13 text-[#191919]">
       <main className="flex-grow">
         <div className="max-w-3xl mx-auto px-6 py-20">
           <h1 className="text-4xl font-bold tracking-tight text-center mb-2">
-            Contact{" "}
+            Submit Your{" "}
             <span className="bg-gradient-to-br from-orange-500 to-orange-600 bg-clip-text text-transparent">
-              Us
+              Idea
             </span>
           </h1>
           <p className="text-md font-medium text-gray-500 text-center mb-12">
-            Have a question, idea, or feedback? We'd love to hear from you.
+            Have an innovative startup idea? Share it with us and inspire others!
           </p>
 
           <form className="space-y-6" onSubmit={handleSubmit}>

@@ -90,7 +90,7 @@ const ViewIdea = () => {
   }
 
   return (
-    <section className="py-16 px-6 flex justify-center">
+    <section className="py-16 pt-30 px-6 flex justify-center">
       <div className="bg-white shadow-lg rounded-2xl max-w-3xl w-full p-8">
         <div className="flex justify-center mb-6">
           <img
