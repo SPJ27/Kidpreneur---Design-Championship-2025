@@ -1,14 +1,26 @@
-'use client'
 import { motion } from "framer-motion";
 import CountUp from "react-countup";
 import { FaLightbulb } from "react-icons/fa";
 import { FcBusinessman, FcIdea, FcPositiveDynamic } from "react-icons/fc";
 import { useInView } from "react-intersection-observer";
 import { Link } from "react-router-dom";
-
-const Hero = () => {
+import { supabase } from "../utils/supabase";
+import { useEffect, useState } from "react";
+const Hero =  () => {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.5 });
+  const [ideaCount, setIdeaCount] = useState(0);
+  const [randomStudentInspired, setRandomStudentInspired] = useState(0);
+  useEffect(() => {
+    const fetchCount = async () => {
+      const { count, error } = await supabase
+        .from("kid_ideas")
+        .select("*", { count: "exact", head: true });
 
+      if (!error) { setIdeaCount(count || 0); setRandomStudentInspired(Math.floor(Math.random() * 50)); }
+    };
+    fetchCount();
+  }, []);
+  
   return (
     <>
       <section className="relative pt-24 md:pt-32 pb-10 px-6 md:px-12 flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 overflow-hidden">
@@ -66,9 +78,9 @@ const Hero = () => {
       >
         <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full max-w-5xl">
           {[
-            { icon: <FcIdea size={36} />, stat: 100, label: "Ideas Submitted" },
-            { icon: <FcBusinessman size={36} />, stat: 50, label: "Students Inspired" },
-            { icon: <FcPositiveDynamic size={36} />, stat: 30, label: "Projects Launched" },
+            { icon: <FcIdea size={36} />, stat: ideaCount, label: "Ideas Submitted" },
+            { icon: <FcBusinessman size={36} />, stat: randomStudentInspired, label: "Students Inspired" },
+            { icon: <FcPositiveDynamic size={36} />, stat: ideaCount-1, label: "Projects Launched" },
           ].map((item, index) => (
             <motion.li
               key={index}
